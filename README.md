@@ -7,8 +7,4 @@
 **Функция:**
 ```latex
 f(x) = \cos\left( \left( \frac{x^3 - x^2 - x + 1}{x^2} \right) \cdot 3x^3 \right)
-
-Упрощение:
-\frac{x^3 - x^2 - x + 1}{x^2} = x - 1 - \frac{1}{x} + \frac{1}{x^2}
-
 ```
