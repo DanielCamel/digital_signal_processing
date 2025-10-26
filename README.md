@@ -1,2 +1,14 @@
-# digital_signal_processing
-Assignments on the course "Digital processing of signals and images"
+# Digital Signal Processing - Fourier Analysis
+
+Анализ сигнала методами преобразования Фурье для функции 12.
+
+## Исходная функция
+
+**Функция:**
+```latex
+f(x) = \cos\left( \left( \frac{x^3 - x^2 - x + 1}{x^2} \right) \cdot 3x^3 \right)
+
+Упрощение:
+\frac{x^3 - x^2 - x + 1}{x^2} = x - 1 - \frac{1}{x} + \frac{1}{x^2}
+
+```
