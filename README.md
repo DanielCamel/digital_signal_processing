@@ -13,7 +13,7 @@ $\frac{x^3 - x^2 - x + 1}{x^2} = x - 1 - \frac{1}{x} + \frac{1}{x^2}$
 $3x³ \cdot (x - 1 - \frac{1}{x} + \frac{1}{x²}) = 3x⁴ - 3x³ - 3x² + 3x$
 
 **Итоговая функция:**
-$f(x) = cos(3x⁴ - 3x³ - 3x² + 3x)$
+$f(x) = cos(3x^4 - 3x^3 - 3x^2 + 3x)$
 
 ## Параметры анализа
 
@@ -28,7 +28,7 @@ $f(x) = cos(3x⁴ - 3x³ - 3x² + 3x)$
 $X(k) = \sum{x(n) \cdot e^(-j\frac{2π}{N})kn)}$
 
 ### Обратное преобразование Фурье
-$x(n) = (1/N) * Σ X(k) * e^(j\frac{2π}{N}kn)$
+$x(n) = \frac{1}{N} \cdot \sum{X(k) \cdot e^{j\frac{2π}{N}kn}}$
 
 ### Свертка сигналов
 $y(n) = x(n) \cdot h(n) = \sum{x(m) \cdot h(n-m)}$
@@ -37,10 +37,10 @@ $y(n) = x(n) \cdot h(n) = \sum{x(m) \cdot h(n-m)}$
 $h(x) = \frac{1}{\sigma\cdot\sqrt{2π}} \cdot e^\frac{-x²}{2\sigma^2}), \sigma = 0.5$
 
 ### Оценка схожести (MSE)
-$MSE = \frac{1}{N} \cdot \sum{\abs{x_исх(n) - x_восст(n)}^2}$
+$MSE = \frac{1}{N} \cdot \sum{|x_исх(n) - x_восст(n)|^2}$
 
 ### Дискретно-временное преобразование Фурье
-$X(e^(jω)) = \sum{x(n) \cdot e^(-j\omega n)}$
+$X(e^{j\omega}) = \sum{x(n) \cdot e^{-j\omega n}}$
 
 ## Реализованные пункты задания
 
