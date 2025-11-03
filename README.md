@@ -25,7 +25,7 @@ $f(x) = cos(3x^4 - 3x^3 - 3x^2 + 3x)$
 ## Теоретические основы
 
 ### Прямое преобразование Фурье
-$X(k) = \sum{x(n) \cdot e^(-j\frac{2π}{N})kn)}$
+$X(k) = \sum{x(n) \cdot e^{-j\frac{2π}{N}kn}$
 
 ### Обратное преобразование Фурье
 $x(n) = \frac{1}{N} \cdot \sum{X(k) \cdot e^{j\frac{2π}{N}kn}}$
@@ -37,7 +37,7 @@ $y(n) = x(n) \cdot h(n) = \sum{x(m) \cdot h(n-m)}$
 $h(x) = \frac{1}{\sigma\cdot\sqrt{2π}} \cdot e^\frac{-x²}{2\sigma^2}), \sigma = 0.5$
 
 ### Оценка схожести (MSE)
-$MSE = \frac{1}{N} \cdot \sum{|x_исх(n) - x_восст(n)|^2}$
+$MSE = \frac{1}{N} \cdot \sum{|x_{исх}(n) - x_{восст}(n)|^2}$
 
 ### Дискретно-временное преобразование Фурье
 $X(e^{j\omega}) = \sum{x(n) \cdot e^{-j\omega n}}$
