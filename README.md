@@ -1,4 +1,4 @@
-# Digital Signal Processing - Fourier Analysis
+# Цифровая обработка сигналов 
 
 Анализ сигнала методами преобразования Фурье.
 

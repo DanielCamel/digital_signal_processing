@@ -1,3 +1,4 @@
+# Haar 1D Transform Implementation
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import integrate
@@ -6,13 +7,7 @@ from scipy import integrate
 def f(x):
 
     """
-    Исходная функция для разложения: f(x) = -1 / (x^2 + 1).
-
-    Параметры:
-        x: скаляр или массив NumPy с точками на оси x.
-
-    Возвращает:
-        Значение(я) функции f(x).
+    Исходная функция для разложения
     """
     return -1.0 / (x * x + 1.0)
 
@@ -21,19 +16,6 @@ def compute_haar_coefficients(target_function, levels=3, interval=(0.0, 1.0)):
 
     """
     Вычисляет коэффициенты разложения по базису Хаара на отрезке [a,b].
-
-    Формула из условия:
-        c00 = ∫_a^b f(x) dx,
-        d_{j,k} = ∫_{i2^{-j}}^{(i+0.5)2^{-j}} f(x) dx − ∫_{(i+0.5)2^{-j}}^{(i+1)2^{-j}} f(x) dx.
-
-    Параметры:
-        target_function: вызываемая функция f(x).
-        levels: число уровней детализации (целое ≥ 0).
-        interval: кортеж (a, b) границы интегрирования.
-
-    Возвращает:
-        (c00, d) где c00 — аппроксимирующий коэффициент,
-        d — список уровней, каждый уровень — список коэффициентов d_{j,k}.
     """
     a, b = interval
     c00, _ = integrate.quad(target_function, a, b)
@@ -57,17 +39,8 @@ def compute_haar_coefficients(target_function, levels=3, interval=(0.0, 1.0)):
 def reconstruct_piecewise_average(target_function, level, interval=(0.0, 1.0)):
 
     """
-    Строит кусочно-постоянную аппроксимацию уровня V_level как средние значения
+    Строит кусочно-постоянную апроксимацию уровня V_level как средние значения
     функции по равным подотрезкам.
-
-    Параметры:
-        target_function: функция f(x).
-        level: уровень (число разбиений 2^level).
-        interval: (a, b) границы.
-
-    Возвращает:
-        (xs, values), где xs — узлы разбиения (длина 2^level + 1),
-        values — средние значения на каждом из 2^level подотрезков.
     """
     a, b = interval
     num_bins = 2 ** level
@@ -86,15 +59,6 @@ def check_parseval(target_function, levels=3, interval=(0.0, 1.0)):
 
     """
     Проверяет приближённое равенство Парсеваля для разложения Хаара:
-    ∫ f^2 ≈ c00^2 + Σ_j Σ_k d_{j,k}^2.
-
-    Параметры:
-        target_function: функция f(x).
-        levels: число уровней, используемых в сумме по j.
-        interval: (a, b) границы интегрирования.
-
-    Возвращает:
-        (integral_f_squared, partial_energy) — левая и правая части равенства.
     """
     a, b = interval
     integral_f_squared, _ = integrate.quad(lambda x: target_function(x) ** 2, a, b)
@@ -110,15 +74,6 @@ def estimate_energy_error(target_function, levels=3, interval=(0.0, 1.0)):
 
     """
     Вычисляет модуль расхождения между ∫ f^2 и суммой энергий коэффициентов
-    Хаара на первых levels уровнях.
-
-    Параметры:
-        target_function: функция f(x).
-        levels: число уровней.
-        interval: (a, b) границы.
-
-    Возвращает:
-        Невязку (неотрицательное число).
     """
     integral_f_squared, partial_energy = check_parseval(target_function, levels=levels, interval=interval)
     return abs(integral_f_squared - partial_energy)
@@ -127,13 +82,7 @@ def estimate_energy_error(target_function, levels=3, interval=(0.0, 1.0)):
 def plot_reconstruction(target_function, level=3, interval=(0.0, 1.0)):
 
     """
-    Рисует график исходной функции и её кусочно-постоянной аппроксимации V_level
-    с вертикальными разделителями как на примере-изображении.
-
-    Параметры:
-        target_function: функция f(x).
-        level: уровень аппроксимации (2^level столбиков).
-        interval: (a, b) границы отрезка.
+    Рисует график исходной функции и её кусочно-постоянной апроксимации V_level
     """
     a, b = interval
     dense_x = np.linspace(a, b, 2001)
@@ -150,7 +99,7 @@ def plot_reconstruction(target_function, level=3, interval=(0.0, 1.0)):
     plt.grid(True, linestyle=":", linewidth=0.6)
     plt.legend()
     plt.tight_layout()
-    plt.title("Разложение Хаара: f(x) и кусочно-постоянная аппроксимация")
+    plt.title("Разложение Хаара: f(x) и кусочно-постоянная апроксимация")
     plt.show()
 
 
