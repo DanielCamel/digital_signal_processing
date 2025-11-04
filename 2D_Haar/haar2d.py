@@ -133,11 +133,16 @@ plt.tight_layout()
 plt.show()
 
 # verification (reconstruction error calculation)
-diff = np.abs(reconstructed - A)
-max_err = diff.max()
-print(f"Maximum absolute reconstruction error: {max_err:e}")
-if max_err < 1e-9:
-    print("Reconstruction exact within numerical precision.")
-else:
-    print("Reconstruction differs; check computations.")
+# Среднеквадратичное отклонение (сумма квадратов разностей):
+#     ε_MSE_sum = Σ_i Σ_j (A_ij - Â_ij)^2
+# где:
+#   A_ij  — элементы исходной матрицы (оригинал),
+#   Â_ij — элементы восстановленной матрицы после обратного преобразования.
+
+diff = A - reconstructed
+squared_diff = diff ** 2
+mse_sum = np.sum(squared_diff)
+
+print("Сумма квадратов разностей (ε_MSE_sum):", mse_sum)
+
 
