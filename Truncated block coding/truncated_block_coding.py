@@ -130,6 +130,117 @@ def apply_filter(image, kernel, padding_type='toroidal'):
     
     return filtered_image
 
+def apply_affine_transform(image, A, t, output_shape=None):
+    """
+    Применяет аффинное преобразование с T-схемой (тороидальной) и билинейной интерполяцией.
+    Обратное отображение + T-границы + интерполяция.
+    """
+    h, w = image.shape
+    if output_shape is None:
+        output_shape = (h, w)
+    out_h, out_w = output_shape
+    
+    # Расширяем A и t до однородных координат
+    M = np.eye(3)
+    M[:2, :2] = A
+    M[:2, 2] = t
+    M_inv = np.linalg.inv(M)
+    
+    result = np.zeros((out_h, out_w), dtype=np.float32)
+    
+    for i in range(out_h):
+        for j in range(out_w):
+            # Обратное отображение: из выходного -> исходное
+            src = M_inv @ np.array([j, i, 1.0])
+            x, y = src[0], src[1]
+            
+            # T-схема: wrap по модулю
+            x = x % w
+            y = y % h
+            
+            # Билинейная интерполяция
+            x0 = int(np.floor(x))
+            y0 = int(np.floor(y))
+            x1 = (x0 + 1) % w
+            y1 = (y0 + 1) % h
+            dx = x - x0
+            dy = y - y0
+            
+            # Значения четырёх соседей
+            I00 = image[y0, x0]
+            I01 = image[y0, x1]
+            I10 = image[y1, x0]
+            I11 = image[y1, x1]
+            
+            # Билинейная интерполяция
+            val = (
+                I00 * (1 - dx) * (1 - dy) +
+                I01 * dx * (1 - dy) +
+                I10 * (1 - dx) * dy +
+                I11 * dx * dy
+            )
+            result[i, j] = val
+    
+    return result
+
+def apply_affine_transformations_demo(image):
+    """
+    Демонстрация трёх аффинных преобразований:
+    1. Поворот на 30°
+    2. Масштабирование 1.2x
+    3. Горизонтальный сдвиг
+    Все — с T-схемой.
+    """
+    h, w = image.shape
+    cx, cy = w / 2, h / 2
+    results = {}
+
+    # 1. Поворот на 30°
+    theta = np.radians(30)
+    A_rot = np.array([[np.cos(theta), -np.sin(theta)],
+                      [np.sin(theta),  np.cos(theta)]])
+    # Компенсация смещения центра
+    t_rot = np.array([cx, cy]) - A_rot @ np.array([cx, cy])
+    rotated = apply_affine_transform(image, A_rot, t_rot)
+    results['Поворот 30°'] = rotated
+
+    # 2. Масштабирование 1.2x
+    scale = 1.2
+    A_scale = np.array([[scale, 0],
+                        [0, scale]])
+    t_scale = np.array([cx, cy]) - A_scale @ np.array([cx, cy])
+    scaled = apply_affine_transform(image, A_scale, t_scale)
+    results['Масштаб 1.2x'] = scaled
+
+    # 3. Сдвиг (shear) по X
+    k = 0.3
+    A_shear = np.array([[1, k],
+                        [0, 1]])
+    t_shear = np.array([0, 0])  # без компенсации
+    sheared = apply_affine_transform(image, A_shear, t_shear)
+    results['Сдвиг (k=0.3)'] = sheared
+
+    # Визуализация
+    plt.figure(figsize=(15, 5))
+    plt.subplot(1, 4, 1)
+    plt.imshow(image, cmap='gray')
+    plt.title('Исходное')
+    plt.axis('off')
+
+    for idx, (name, img) in enumerate(results.items(), 2):
+        plt.subplot(1, 4, idx)
+        plt.imshow(img, cmap='gray')
+        plt.title(name)
+        plt.axis('off')
+        
+        # Вывод min/max
+        print(f"{name}: min={np.min(img):.2f}, max={np.max(img):.2f}")
+    
+    plt.tight_layout()
+    plt.show()
+    
+    return results
+
 def median_filter(image, window_size=3):
     """Медианный фильтр с торOIDальной обработкой"""
     height, width = image.shape
@@ -287,44 +398,40 @@ def get_image_path():
 
 # Основной код выполнения задания
 def main():
-    # Загрузка изображения
     image_path = get_image_path()
     image = Image.open(image_path).convert('L')
-    image_array = np.array(image, dtype=np.float32)  # или dtype=np.int16
-    
-    # 1. Построение гистограммы
+    image_array = np.array(image, dtype=np.float32)
+
     print("1. Построение гистограммы яркости")
     histogram = build_histogram(image_array)
-    
-    # 2. Вычисление моментов
+
     print("\n2. Вычисление начальных и центральных моментов")
     moments = calculate_moments(image_array, histogram)
-    
-    # 3. Вычисление энтропии и избыточности
+
     print("\n3. Вычисление энтропии и избыточности")
     entropy, redundancy = calculate_entropy_and_redundancy(histogram)
-    
-    # 4. Усеченное блочное кодирование
+
     print("\n4. Усеченное блочное кодирование")
     encoded_image, blocks_info, mse, psnr = btc_encoding(image_array)
-    
-    # Визуализация исходного и закодированного изображений
+
     plt.figure(figsize=(12, 6))
     plt.subplot(1, 2, 1)
     plt.imshow(image_array, cmap='gray')
     plt.title('Исходное изображение')
     plt.axis('off')
-
     plt.subplot(1, 2, 2)
     plt.imshow(encoded_image, cmap='gray')
-    plt.title(f'Закодированное изображение\nMSE: {mse:.2f}, PSNR: {psnr:.2f} дБ')
+    plt.title(f'Закодированное\nMSE: {mse:.2f}, PSNR: {psnr:.2f} дБ')
     plt.axis('off')
-
     plt.tight_layout()
     plt.show()
-    
-    # 5. Геометрические преобразования (фильтрация)
-    print("\n5. Геометрические преобразования (фильтрация)")
+
+    # === НАСТОЯЩИЙ ПУНКТ 5 ПО ЗАДАНИЮ ===
+    print("\n5. Геометрические преобразования (аффинные)")
+    affine_results = apply_affine_transformations_demo(image_array)
+
+    # Опционально: фильтрация как пункт 6
+    print("\n6. Локальная фильтрация")
     filtered_results = apply_all_filters(image_array)
 
 if __name__ == "__main__":
